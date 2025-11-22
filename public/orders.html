@@ -286,7 +286,7 @@
 
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'https://pulse-parcel.onrender.com/api' 
-            : 'https://one0kvendor.onrender.com/api';
+            : 'http://localhost:5000';
 
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
@@ -729,4 +729,5 @@
     });
     </script>
 </body>
+
 </html>
