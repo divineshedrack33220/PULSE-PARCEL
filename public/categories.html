@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - PULSE PARCLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #FF7A2F;
+            --secondary-brown: #3E2723;
+            --accent-cream: #FFF6ED;
+            --neutral-gray: #555555;
+            --light-gray: #EDEDED;
+            --alert-red: #EF4444;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--accent-cream);
+            color: var(--secondary-brown);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .category-card:hover .category-icon {
+            background-color: var(--primary-orange);
+            color: white;
+        }
+
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 1s;
+        }
+
+        .ripple:active:after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(0,0,0,0.12);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Top Header: Back Button (Left) + Title (Center) -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between relative">
+            <!-- Back Button -->
+            <button onclick="history.back()" class="back-button ripple" aria-label="Go back">
+                <i data-feather="arrow-left" class="w-6 h-6 text-neutral-gray"></i>
+            </button>
+
+            <!-- Centered Page Title -->
+            <h1 class="absolute left-1/2 transform -translate-x-1/2 text-lg font-bold text-neutral-gray">
+                Shop Categories
+            </h1>
+
+            <!-- Empty div to balance flex layout -->
+            <div class="w-10 h-10"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-6 pb-10">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="category-list">
+            <!-- Shimmer placeholders -->
+            <div class="category-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 shimmer"></div>
+                <div class="h-5 w-3/4 bg-gray-200 mx-auto mb-2 shimmer"></div>
+                <div class="h-4 w-1/2 bg-gray-200 mx-auto shimmer"></div>
+            </div>
+            <div class="category-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 shimmer"></div>
+                <div class="h-5 w-3/4 bg-gray-200 mx-auto mb-2 shimmer"></div>
+                <div class="h-4 w-1/2 bg-gray-200 mx-auto shimmer"></div>
+            </div>
+            <div class="category-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 shimmer"></div>
+                <div class="h-5 w-3/4 bg-gray-200 mx-auto mb-2 shimmer"></div>
+                <div class="h-4 w-1/2 bg-gray-200 mx-auto shimmer"></div>
+            </div>
+            <div class="category-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 shimmer"></div>
+                <div class="h-5 w-3/4 bg-gray-200 mx-auto mb-2 shimmer"></div>
+                <div class="h-4 w-1/2 bg-gray-200 mx-auto shimmer"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        feather.replace();
+
+        const API_BASE_URL = 'https://pulse-parcel.onrender.com/api';
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast fixed top-4 right-4 px-4 py-2 rounded-full text-white text-sm shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        async function fetchCategories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/public/categories`);
+                if (!response.ok) throw new Error('Failed to load categories');
+                const categories = await response.json();
+                const container = document.querySelector('#category-list');
+                container.innerHTML = categories.length === 0 
+                    ? '<p class="col-span-full text-center text-gray-500">No categories found.</p>'
+                    : categories.map(cat => `
+                        <a href="/category-product.html?category=${cat._id}" class="bg-white rounded-xl p-5 shadow-sm category-card transition-all duration-300 ripple text-center">
+                            <div class="category-icon w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i data-feather="${cat.icon || 'shopping-bag'}" class="w-8 h-8 text-orange-500"></i>
+                            </div>
+                            <h3 class="font-semibold text-neutral-gray">${cat.name}</h3>
+                            <p class="text-xs text-gray-500 mt-1">${cat.itemCount?.toLocaleString() || 0} items</p>
+                        </a>
+                    `).join('');
+                feather.replace();
+                setupRippleEffect();
+            } catch (err) {
+                document.querySelector('#category-list').innerHTML = '<p class="col-span-full text-center text-red-500">Failed to load categories</p>';
+                showToast('Network error', 'error');
+            }
+        }
+
+        function setupRippleEffect() {
+            document.querySelectorAll('.ripple').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+            fetchCategories();
+            setupRippleEffect();
+        });
+    </script>
+</body>
+</html>
